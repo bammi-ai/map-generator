@@ -1,0 +1,11 @@
+[package]
+name = "bammi-ai-map-generator"
+publish = false
+version = "0.1.0"
+
+[dependencies]
+rand = "0.8.5"
+
+[lib]
+name = "bammi_ai_map_generator"
+path = "src/lib.rs"
