@@ -56,27 +56,13 @@ fn new_repeated(width: usize, height: usize, p: f64) -> Map {
                 width: usize,
                 height: usize,
             ) {
-                let x = if x == width {
-                    0
-                } else if x == usize::MAX {
-                    width - 1
-                } else {
-                    x
-                };
-                let y = if y == height {
-                    0
-                } else if y == usize::MAX {
-                    height - 1
-                } else {
-                    y
-                };
                 if map[y][x] != 0 {
                     return;
                 }
                 map[y][x] = to;
                 if !vertical_walls[y][x] {
                     flood_fill(
-                        x - 1,
+                        (width + x - 1) % width,
                         y,
                         to,
                         map,
@@ -86,9 +72,9 @@ fn new_repeated(width: usize, height: usize, p: f64) -> Map {
                         height,
                     );
                 }
-                if !vertical_walls[y][x + 1] {
+                if !vertical_walls[y][(x + 1) % width] {
                     flood_fill(
-                        x + 1,
+                        (x + 1) % width,
                         y,
                         to,
                         map,
@@ -101,7 +87,7 @@ fn new_repeated(width: usize, height: usize, p: f64) -> Map {
                 if !horizontal_walls[y][x] {
                     flood_fill(
                         x,
-                        y - 1,
+                        (height + y - 1) % height,
                         to,
                         map,
                         vertical_walls,
@@ -110,10 +96,10 @@ fn new_repeated(width: usize, height: usize, p: f64) -> Map {
                         height,
                     );
                 }
-                if !horizontal_walls[y + 1][x] {
+                if !horizontal_walls[(y + 1) % height][x] {
                     flood_fill(
                         x,
-                        y + 1,
+                        (y + 1) % height,
                         to,
                         map,
                         vertical_walls,
@@ -153,30 +139,56 @@ fn new_repeated(width: usize, height: usize, p: f64) -> Map {
             positions: &mut Vec<(usize, usize)>,
             neighbors: &mut BTreeSet<usize>,
         ) {
-            let x = if x == width {
-                0
-            } else if x == usize::MAX {
-                width - 1
-            } else {
-                x
-            };
-            let y = if y == height {
-                0
-            } else if y == usize::MAX {
-                height - 1
-            } else {
-                y
-            };
             if map[y][x] != from {
                 neighbors.insert(map[y][x]);
                 return;
             }
             positions.push((x, y));
             map[y][x] = to;
-            flood_fill(x - 1, y, from, to, map, width, height, positions, neighbors);
-            flood_fill(x + 1, y, from, to, map, width, height, positions, neighbors);
-            flood_fill(x, y - 1, from, to, map, width, height, positions, neighbors);
-            flood_fill(x, y + 1, from, to, map, width, height, positions, neighbors);
+            flood_fill(
+                (width + x - 1) % width,
+                y,
+                from,
+                to,
+                map,
+                width,
+                height,
+                positions,
+                neighbors,
+            );
+            flood_fill(
+                (x + 1) % width,
+                y,
+                from,
+                to,
+                map,
+                width,
+                height,
+                positions,
+                neighbors,
+            );
+            flood_fill(
+                x,
+                (height + y - 1) % height,
+                from,
+                to,
+                map,
+                width,
+                height,
+                positions,
+                neighbors,
+            );
+            flood_fill(
+                x,
+                (y + 1) % height,
+                from,
+                to,
+                map,
+                width,
+                height,
+                positions,
+                neighbors,
+            );
         }
         let (x, y) = find_first(&map, i + 1).unwrap();
         flood_fill(
@@ -241,12 +253,11 @@ fn new_not_repeated(width: usize, height: usize, p: f64) -> Map {
                 width: usize,
                 height: usize,
             ) {
-                if x == usize::MAX || x == width || y == usize::MAX || y == height || map[y][x] != 0
-                {
+                if map[y][x] != 0 {
                     return;
                 }
                 map[y][x] = to;
-                if !vertical_walls[y][x] {
+                if x != 0 && !vertical_walls[y][x] {
                     flood_fill(
                         x - 1,
                         y,
@@ -270,7 +281,7 @@ fn new_not_repeated(width: usize, height: usize, p: f64) -> Map {
                         height,
                     );
                 }
-                if !horizontal_walls[y][x] {
+                if y != 0 && !horizontal_walls[y][x] {
                     flood_fill(
                         x,
                         y - 1,
@@ -325,19 +336,24 @@ fn new_not_repeated(width: usize, height: usize, p: f64) -> Map {
             positions: &mut Vec<(usize, usize)>,
             neighbors: &mut BTreeSet<usize>,
         ) {
-            if x == usize::MAX || x == width || y == usize::MAX || y == height {
-                return;
-            }
             if map[y][x] != from {
                 neighbors.insert(map[y][x]);
                 return;
             }
             positions.push((x, y));
             map[y][x] = to;
-            flood_fill(x - 1, y, from, to, map, width, height, positions, neighbors);
-            flood_fill(x + 1, y, from, to, map, width, height, positions, neighbors);
-            flood_fill(x, y - 1, from, to, map, width, height, positions, neighbors);
-            flood_fill(x, y + 1, from, to, map, width, height, positions, neighbors);
+            if x != 0 {
+                flood_fill(x - 1, y, from, to, map, width, height, positions, neighbors);
+            }
+            if x != width - 1 {
+                flood_fill(x + 1, y, from, to, map, width, height, positions, neighbors);
+            }
+            if y != 0 {
+                flood_fill(x, y - 1, from, to, map, width, height, positions, neighbors);
+            }
+            if y != height - 1 {
+                flood_fill(x, y + 1, from, to, map, width, height, positions, neighbors);
+            }
         }
         let (x, y) = find_first(&map, i + 1).unwrap();
         flood_fill(
