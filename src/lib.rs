@@ -5,18 +5,18 @@ use std::collections::BTreeSet;
 use rand::Rng;
 
 pub struct Tile {
-    x: usize,
-    y: usize,
-    id: usize,
-    neighbors: Vec<usize>,
+    pub x: usize,
+    pub y: usize,
+    pub id: usize,
+    pub neighbors: Vec<usize>,
 }
 
 pub struct Map {
-    width: usize,
-    height: usize,
-    is_repeated: bool,
-    map: Vec<Vec<usize>>,
-    tiles: Vec<Tile>,
+    pub width: usize,
+    pub height: usize,
+    pub is_repeated: bool,
+    pub map: Vec<Vec<usize>>,
+    pub tiles: Vec<Tile>,
 }
 
 fn find_first<T: PartialEq>(haystack: &[Vec<T>], needle: T) -> Option<(usize, usize)> {
