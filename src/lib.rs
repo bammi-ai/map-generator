@@ -5,18 +5,31 @@ use std::collections::BTreeSet;
 use rand::Rng;
 
 pub struct Tile {
-    pub x: usize,
-    pub y: usize,
-    pub id: usize,
-    pub neighbors: Vec<usize>,
+    position: (usize, usize),
+    id: usize,
+    neighbors: Vec<usize>,
+}
+
+impl Tile {
+    pub fn position(&self) -> (usize, usize) {
+        self.position
+    }
+
+    pub fn id(&self) -> usize {
+        self.id
+    }
+
+    pub fn neighbors(&self) -> &Vec<usize> {
+        &self.neighbors
+    }
 }
 
 pub struct Map {
-    pub width: usize,
-    pub height: usize,
-    pub is_repeated: bool,
-    pub map: Vec<Vec<usize>>,
-    pub tiles: Vec<Tile>,
+    width: usize,
+    height: usize,
+    is_repeated: bool,
+    map: Vec<Vec<usize>>,
+    tiles: Vec<Tile>,
 }
 
 fn find_first<T: PartialEq>(haystack: &[Vec<T>], needle: T) -> Option<(usize, usize)> {
@@ -206,8 +219,7 @@ fn new_repeated(width: usize, height: usize, p: f64) -> Map {
             .get(rand::thread_rng().gen_range(0..positions.len()))
             .unwrap();
         tiles.push(Tile {
-            x: *x,
-            y: *y,
+            position: (*x, *y),
             id: i,
             neighbors: neighbors
                 .iter()
@@ -371,8 +383,7 @@ fn new_not_repeated(width: usize, height: usize, p: f64) -> Map {
             .get(rand::thread_rng().gen_range(0..positions.len()))
             .unwrap();
         tiles.push(Tile {
-            x: *x,
-            y: *y,
+            position: (*x, *y),
             id: i,
             neighbors: neighbors
                 .iter()
@@ -396,5 +407,17 @@ impl Map {
         } else {
             new_not_repeated(width, height, p)
         }
+    }
+
+    pub fn size(&self) -> (usize, usize, bool) {
+        (self.width, self.height, self.is_repeated)
+    }
+
+    pub fn map(&self) -> &Vec<Vec<usize>> {
+        &self.map
+    }
+
+    pub fn tiles(&self) -> &Vec<Tile> {
+        &self.tiles
     }
 }
